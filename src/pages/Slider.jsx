@@ -10,7 +10,7 @@ export default function Slider({movies}) {
     const navigate = useNavigate();
     const goDetail = (id) => {
         navigate(`/movies/${movies.id}`);
-    }
+    } 
     return (
         
         <Swiper 
