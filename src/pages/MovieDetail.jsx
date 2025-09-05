@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-// import movieDetailData from '../data/movieDetailData.json'
 import { useParams } from 'react-router-dom'
 import { HEADERS, IMG_PATH } from '../utils/constants' 
 import Skeleton from 'react-loading-skeleton';

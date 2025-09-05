@@ -3,20 +3,25 @@ import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
 import 'swiper/css'
-import { IMG_PATH } from '../utils/constants'
+import { IMG_PATH  } from '../utils/constants.js'
 import { Link } from 'react-router-dom'
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useSelector } from 'react-redux'
 
-export default function Slider({ movies = [] }) {
-  const [isLoading, setIsLoading] = useState(true)
+export default function Slider() {
+    const { data: movies, loading, error } = useSelector(state => state.movies); 
+    const [isLoading, setIsLoading] = useState(true)    
 
-  useEffect(() => {
-    if (movies.length > 0) setIsLoading(false)
-  }, [movies])
+    useEffect(() => {
+        // movies 값이 들어오면 로딩 종료
+        if (movies.length > 0) setIsLoading(false) 
+    }, [movies])
+    const SKELETON_COUNT = 8 // 보여줄 스켈레톤 개수
 
-  const SKELETON_COUNT = 8 
-
+    if (loading) return <div className="p-4 text-white">목록 불러오는 중…</div>;
+    if (error) return <div className="p-4 text-red-400">에러: {error}</div>;
+    if (!movies.length) return <div className="p-4 text-white">영화가 없습니다.</div>;
   return (
     <SkeletonTheme baseColor="#e5e7eb" highlightColor="#f3f4f6">
       <Swiper
@@ -34,7 +39,8 @@ export default function Slider({ movies = [] }) {
           : movies.map((movie) => {
             const dateString = movie.release_date
             const formattedDate = moment(dateString).format('MM월 DD, YYYY')
-
+            console.log(movies);
+            
             return (
                 <SwiperSlide
                 key={movie.id}
@@ -43,7 +49,7 @@ export default function Slider({ movies = [] }) {
                     <Link to={`/movies/${movie.id}`} className="block">
                     <div className="aspect-[2/3] overflow-hidden">
                         <img
-                        src={`${IMG_PATH}${movie.poster_path}`}
+                        src={movie.img}
                         className="w-full h-full object-cover"
                         alt={movie.title}
                       />

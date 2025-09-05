@@ -5,8 +5,8 @@ import { Outlet } from 'react-router-dom'
 export default function Layout() {
   return (    
     <>
-        <Navbar />
-        <main>
+        <Navbar  />
+        <main className='pt-[70px]'>
             <Outlet />
         </main>
     </>
