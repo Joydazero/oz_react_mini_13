@@ -1,67 +1,89 @@
 import React, { useEffect, useState, } from 'react'
 import './App.scss'
 import MovieList from './pages/MovieList'
-// import movieListData from './data/movieListData.json'
 import Slider from './pages/Slider'
 import { HEADERS, IMG_PATH } from './utils/constants' 
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchDiscoverMovies } from './RTK/thunk'
+import { useSelector } from 'react-redux';
 
 function App() {  
+  const darkMode = useSelector((state) => state.theme.darkMode );
+
+  const [movieData, setMovies] = useState([]); 
+  const [sliderData, setSliderData] = useState([]);
    
-    const dispatch = useDispatch()
-  
+  // common mapper
+  const mapMovie = ( result ) => (
+     {
+        ...result,
+        adult : result.adult,
+        id : result.id,
+        title : result.title,
+        img : `${IMG_PATH}${result.poster_path}`,
+        backimg : `${IMG_PATH}${result.backdrop_path}`,
+        date : result.release_date,
+        rating: result.vote_average ?? 0,                     
+    }
+  )
+
+  // common fetch 
+  const fetchMovies = async (url) => {
+    const data = await fetch(url, { method: 'GET', headers: HEADERS });
+    if (!data.ok) throw new Error(`HTTP ${data.status}`);
+    const json = await data.json();
+    console.log(json);
+    return(
+      (json.results || []).filter(result => result && result.poster_path && result.adult === false)
+      .map(mapMovie)
+    )
+  }
     useEffect( () => {
-      dispatch(fetchDiscoverMovies())
-    },[dispatch])
-  //   useEffect( () => {
-  //       const fetchMovieList = async() => {
-  //               const options = {
-  //                   method: 'GET',
-  //                   headers: HEADERS
-  //               };
+      ( async () => {
+        try {
+          
+          const sliderUrl = 
+                  'https://api.themoviedb.org/3/trending/movie/week'
+                  + '?language=ko'
+                  + '&sort_by=popularity.desc'
+                  + '&include_adult=false'
+                  + '&include_video=false'
+                  + '&certification_country=US'
+                  + '&certification.lte=PG-13'
+                  + '&page=1'
+          ;
 
-  //               const data = await fetch(
-  //                 'https://api.themoviedb.org/3/discover/movie'
-  //                 + '?language=ko'
-  //                 + '&sort_by=popularity.desc'
-  //                 + '&include_adult=false'
-  //                 + '&include_video=false'
-  //                 + '&certification_country=US'
-  //                 + '&certification.lte=PG-13'
-  //                 + '&page=1',
-  //                 options
-  //               );
-  //               const json = await data.json();
-  //               console.log(json);
-  //               const movieData = json.results.filter(result => result && result.poster_path && result.adult === false)
-  //                   .map( (result) => {
-  //                       return(
-  //                       {
-  //                           ...result,
-  //                           adult : result.adult,
-  //                           id : result.id,
-  //                           title : result.title,
-  //                           img : `${IMG_PATH}${result.poster_path}`,
-  //                           date : result.release_date,
-  //                           rating :result.vote_average,                           
-  //                       }
-  //                       )
+          const listUrl =
+                  'https://api.themoviedb.org/3/discover/movie'
+                  + '?language=ko'
+                  + '&sort_by=popularity.desc'
+                  + '&include_adult=false'
+                  + '&include_video=false'
+                  + '&certification_country=US'
+                  + '&certification.lte=PG-13'
+                  + '&page=1';
 
-  //                   })
-  //               setMovies(movieData)
-  //           }
-  //           fetchMovieList();
-  // },[]);
+          const [slider, list] = await Promise.all([
+            fetchMovies(sliderUrl),
+            fetchMovies(listUrl),
+          ]);
+
+          setSliderData(slider);
+          setMovies(list);
+
+        } catch (e) {
+          console.error(e);
+        }
+
+       })();
+  }, []);
 
   return (
     <> 
-      <div className='home__inner'>
-        <div className='slider__wrap bg-[#e2e2e25c]'>
-          <Slider  />
+      <div >
+        <div className='pt-[20px] pb-[20px] lg:px-[15px] bg-[#dfdfdf] dark:bg-[#1b1b1b]'>
+          <Slider movieData={sliderData}  />
         </div>
-        <div className='list__wrap'>          
-          <MovieList/>
+        <div className='list__wrap px-[10px] pt-[20px] pb-[20px] lg:px-[4rem] lg:pb-[3rem] dark:bg-[#1b1b1b]'>          
+          <MovieList movieData={movieData}  />
         </div>
       </div>
     </>
