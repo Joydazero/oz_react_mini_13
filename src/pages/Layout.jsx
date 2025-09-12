@@ -17,7 +17,7 @@ export default function Layout() {
   return (    
     <>
         <Navbar  />
-        <main className='pt-[110px] md:pt-[80px]'>
+        <main className='pt-[110px] md:pt-[80px] h-full bg-[#fff] dark:bg-[#1b1b1b]'>
             <Outlet />
         </main>
     </>

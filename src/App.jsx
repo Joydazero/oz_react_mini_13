@@ -4,8 +4,36 @@ import MovieList from './pages/MovieList'
 import Slider from './pages/Slider'
 import { HEADERS, IMG_PATH } from './utils/constants' 
 import { useSelector } from 'react-redux';
+import { supabase } from './supabase/supabaseClient';
 
 function App() {  
+  const [user, setUser] = useState(null);
+   useEffect(() => {
+      const getUser = async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (data?.user) {
+          setUser(data.user);
+        }
+      };
+      getUser();
+
+      const { data: listener } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          if (event === "SIGNED_IN") setUser(session.user);
+          if (event === "SIGNED_OUT") setUser(null);
+        }
+      );
+
+      return () => {
+        listener.subscription.unsubscribe();
+      };
+    }, []);
+
+    const handleLogout = async () => {
+      await supabase.auth.signOut();
+      setUser(null);
+    };
+
   const darkMode = useSelector((state) => state.theme.darkMode );
 
   const [movieData, setMovies] = useState([]); 

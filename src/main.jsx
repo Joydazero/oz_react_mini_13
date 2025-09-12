@@ -9,6 +9,10 @@ import Layout from './pages/Layout'
 import Search from './pages/Search'
 import { Provider } from 'react-redux'
 import { store } from './store/store'
+import Login from './pages/member/Login'
+import Signup from './pages/member/Signup'
+import Mypage from './pages/member/Mypage'
+import AuthCallback from './pages/auth/AuthCallback'
 
 // const App = lazy( () => import('./App'))
 // const MovieList = lazy(() => import('./pages/MovieList')) 
@@ -26,6 +30,10 @@ createRoot(document.getElementById('root')).render(
               <Route path='movies' element={<MovieList />}></Route>
               <Route path='movies/:id' element={<MovieDetail />}></Route>   
               <Route path='search' element={<Search/>}></Route>   
+              <Route path='login' element={<Login/>}></Route>   
+              <Route path='signup' element={<Signup/>}></Route>   
+              <Route path='mypage' element={<Mypage/>}></Route>
+              <Route path="auth/callback" element={<AuthCallback />} />   
               <Route path="*" element={<div>Not Found</div>} />
             </Route> 
           </Routes>
